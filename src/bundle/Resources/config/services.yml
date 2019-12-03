@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    MateuszBieniek\EzPlatformPageBuilderMultisiteSiteaccessPickerBundle\Controller\PageController:
+        decorates: EzSystems\EzPlatformPageBuilderBundle\Controller\PageController
+        arguments: ['@MateuszBieniek\EzPlatformPageBuilderMultisiteSiteaccessPickerBundle\Controller\PageController.inner']

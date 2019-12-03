@@ -1,0 +1,29 @@
+{
+  "name": "mateuszbieniek/ezplatform-page-builder-multisite-siteaccess-picker",
+  "license": "MIT",
+  "type": "ezplatform-bundle",
+  "description": "The bundle provides an alternative way of selecting SiteAccess for PageBuilder when Landing Page is edited by clicking on the \"Edit\" button",
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://updates.ez.no/ttl"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "MateuszBieniek\\EzPlatformPageBuilderMultisiteSiteaccessPickerBundle\\": "src/bundle/"
+    }
+  },
+  "require": {
+    "php": ">=7.1",
+    "ezsystems/ezpublish-kernel": "^7.5",
+    "ezsystems/ezplatform-page-builder": "^1.3"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "2.7.*",
+    "phpunit/phpunit": "~7.0"
+  },
+  "scripts": {
+    "fix-cs": "@php ./vendor/bin/php-cs-fixer fix -v --show-progress=estimating"
+  }
+}
