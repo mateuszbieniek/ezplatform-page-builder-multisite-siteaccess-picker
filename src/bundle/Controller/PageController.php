@@ -11,7 +11,6 @@ use EzSystems\EzPlatformPageBuilderBundle\Controller\PageController as PageBuild
 use EzSystems\EzPlatformPageBuilderBundle\DependencyInjection\EzPlatformPageBuilderExtension;
 use EzSystems\RepositoryForms\Content\View\ContentCreateView;
 use EzSystems\RepositoryForms\Content\View\ContentEditView;
-use http\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use EzSystems\EzPlatformPageBuilder\PageBuilder;
@@ -118,7 +117,7 @@ class PageController extends Controller
         }
 
         if (!$currentSiteaccess) {
-            throw new RuntimeException('No siteaccess available for this Page');
+            throw new \RuntimeException('No siteaccess available for this Page');
         }
 
         $this->session->set(EzPlatformPageBuilderExtension::SESSION_KEY_SITEACCESS, $currentSiteaccess);
