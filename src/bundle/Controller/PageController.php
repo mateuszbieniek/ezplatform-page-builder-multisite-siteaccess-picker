@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MateuszBieniek\EzPlatformPageBuilderMultisiteSiteaccessPickerBundle\Controller;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
@@ -104,20 +106,10 @@ class PageController extends Controller
         $siteaccesses = $this->pageBuilderPermissionAwareConfigurationResolver->getSiteaccessList();
         $currentSiteaccess = $this->session->get(EzPlatformPageBuilderExtension::SESSION_KEY_SITEACCESS, reset($siteaccesses));
 
-        if (!$this->isLocationInSiteaccessSubTree($currentSiteaccess, $location)) {
-            $currentSiteaccess = null;
-
-            foreach ($siteaccesses as $availableSiteaccess) {
-                if ($this->isLocationInSiteaccessSubTree($availableSiteaccess, $location)) {
-                    $currentSiteaccess = $availableSiteaccess;
-
-                    break;
-                }
-            }
-        }
+        $currentSiteaccess = $this->getAvailableSiteaccess($currentSiteaccess, $siteaccesses, $location);
 
         if (!$currentSiteaccess) {
-            throw new \RuntimeException('No siteaccess available for this Page');
+            throw new \RuntimeException('No SiteAccess available for this Page');
         }
 
         $this->session->set(EzPlatformPageBuilderExtension::SESSION_KEY_SITEACCESS, $currentSiteaccess);
@@ -135,6 +127,18 @@ class PageController extends Controller
      */
     public function createAction(Request $request, ContentCreateView $view): ContentCreateView
     {
+        $location = $view->getLocation();
+        $siteaccesses = $this->pageBuilderPermissionAwareConfigurationResolver->getSiteaccessList();
+        $currentSiteaccess = $this->session->get(EzPlatformPageBuilderExtension::SESSION_KEY_SITEACCESS, reset($siteaccesses));
+
+        $currentSiteaccess = $this->getAvailableSiteaccess($currentSiteaccess, $siteaccesses, $location);
+
+        if (!$currentSiteaccess) {
+            throw new \RuntimeException('No SiteAccess available for this Root Location');
+        }
+
+        $this->session->set(EzPlatformPageBuilderExtension::SESSION_KEY_SITEACCESS, $currentSiteaccess);
+
         return $this->pageController->createAction($request, $view);
     }
 
@@ -182,5 +186,33 @@ class PageController extends Controller
         return false !== strpos($location->pathString, $rootLocation->pathString)
             ? true
             : false;
+    }
+
+
+    /**
+     * @param $currentSiteaccess
+     * @param $siteaccesses
+     * @param $location
+     *
+     * @return string|null
+     *
+     * @throws \eZ\Publish\API\Repository\Exceptions\NotFoundException
+     * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException
+     */
+    private function getAvailableSiteaccess($currentSiteaccess, $siteaccesses, $location): ?string
+    {
+        if (!$this->isLocationInSiteaccessSubTree($currentSiteaccess, $location)) {
+            $currentSiteaccess = null;
+
+            foreach ($siteaccesses as $availableSiteaccess) {
+                if ($this->isLocationInSiteaccessSubTree($availableSiteaccess, $location)) {
+                    $currentSiteaccess = $availableSiteaccess;
+
+                    break;
+                }
+            }
+        }
+
+        return $currentSiteaccess;
     }
 }

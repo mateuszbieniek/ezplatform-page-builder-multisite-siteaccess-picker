@@ -7,3 +7,9 @@ services:
     MateuszBieniek\EzPlatformPageBuilderMultisiteSiteaccessPickerBundle\Controller\PageController:
         decorates: EzSystems\EzPlatformPageBuilderBundle\Controller\PageController
         arguments: ['@MateuszBieniek\EzPlatformPageBuilderMultisiteSiteaccessPickerBundle\Controller\PageController.inner']
+
+    MateuszBieniek\EzPlatformPageBuilderMultisiteSiteaccessPicker\PageBuilder\Menu\EventListener\ConfigureMainMenuListener:
+        decorates: EzSystems\EzPlatformPageBuilderBundle\Menu\EventListener\ConfigureMainMenuListener
+        arguments: ['@MateuszBieniek\EzPlatformPageBuilderMultisiteSiteaccessPicker\PageBuilder\Menu\EventListener\ConfigureMainMenuListener.inner']
+        tags:
+            - { name: kernel.event_listener, event: ezplatform_admin_ui.menu_configure.main_menu, method: onMenuConfigure, priority: 10 }
