@@ -8,6 +8,18 @@ is better suited for the Multisite setup.
 If Landing Page is outside of last used SiteAccess Subtree, first SiteAccess that shares 
 Subtree with Landing Page will be used.
 
+The same behavior is used when the Landing Page is created.
+
+*Please note that this may result in Editor not being able to create/edit Landing Page if there is no available SiteAccess for the Subtree.*
+
+
+## Configuration
+You can disable limiting of displayed SiteAccesses in the "Page" tab by setting `mateusz_bieniek.multisite.limit_for_page_tag` parameter to `false`:
+```
+parameters:
+    # ...
+    mateusz_bieniek.multisite.limit_for_page_tag: false
+```
 ## Installation
 **Requires eZ Platform Enterprise Edition 2.5 LTS**
 
