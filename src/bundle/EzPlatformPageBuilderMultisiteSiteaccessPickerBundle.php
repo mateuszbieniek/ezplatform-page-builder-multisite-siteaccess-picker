@@ -14,5 +14,7 @@ class EzPlatformPageBuilderMultisiteSiteaccessPickerBundle extends Bundle
      */
     public function build(ContainerBuilder $container): void
     {
+        $core = $container->getExtension('ezpublish');
+        $core->addDefaultSettings(__DIR__ . '/Resources/config', ['default_settings.yml']);
     }
 }
