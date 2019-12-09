@@ -83,8 +83,11 @@ class ConfigureMainMenuListener implements TranslationContainerInterface
 
         foreach ($siteaccesses as $siteaccess) {
             try {
+                if (!$location) {
+                    continue;
+                }
                 $currentLocation = $this->resolveLocation($siteaccess, $location);
-                if(!$currentLocation) {
+                if (!$currentLocation) {
                     continue;
                 }
             } catch (\Exception $e) {
