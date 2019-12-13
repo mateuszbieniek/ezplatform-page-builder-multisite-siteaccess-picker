@@ -94,8 +94,6 @@ class ConfigureMainMenuListener implements TranslationContainerInterface
                 continue;
             }
 
-            dump($siteaccess);
-
             $currentContent = $this->contentService->loadContent($currentLocation->contentId);
             $root[PageBuilderConfigureMainMenuListener::ITEM_PAGE]->addChild($siteaccess, [
                 'route' => 'ezplatform.page_builder.location_preview',
