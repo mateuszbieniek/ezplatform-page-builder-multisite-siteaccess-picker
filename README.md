@@ -1,4 +1,6 @@
 # ezplatform-page-builder-multisite-siteaccess-picker
+![](ezplatform-page-builder-multisite-siteaccess-picker.gif)
+
 ## Description
 The bundle provides an alternative way of selecting SiteAccess for PageBuilder when Landing Page
 is edited by clicking on the "Edit" button.
