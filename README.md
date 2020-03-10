@@ -8,7 +8,8 @@ By default last used SiteAccess is taken and this Bundle changes this behavior s
 is better suited for the Multisite setup.
 
 If Landing Page is outside of last used SiteAccess Subtree, first SiteAccess that shares 
-Subtree with Landing Page will be used.
+Subtree with Landing Page will be used. In addition, selected Translation will be taken into account when determining 
+correct SiteAccess. If SiteAccess with matching Language *and* Subtree can't be find, 
 
 The same behavior is used when the Landing Page is created.
 

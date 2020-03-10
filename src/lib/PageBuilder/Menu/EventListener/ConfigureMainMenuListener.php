@@ -8,10 +8,10 @@ use eZ\Publish\API\Repository\ContentService;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use EzSystems\EzPlatformAdminUi\Menu\Event\ConfigureMenuEvent;
 use EzSystems\EzPlatformPageBuilder\PageBuilder\ConfigurationResolverInterface;
+use EzSystems\EzPlatformPageBuilder\Siteaccess\SiteaccessService;
+use EzSystems\EzPlatformPageBuilderBundle\Menu\EventListener\ConfigureMainMenuListener as PageBuilderConfigureMainMenuListener;
 use JMS\TranslationBundle\Model\Message;
 use JMS\TranslationBundle\Translation\TranslationContainerInterface;
-use EzSystems\EzPlatformPageBuilderBundle\Menu\EventListener\ConfigureMainMenuListener as PageBuilderConfigureMainMenuListener;
-use EzSystems\EzPlatformPageBuilder\Siteaccess\SiteaccessService;
 
 class ConfigureMainMenuListener implements TranslationContainerInterface
 {
@@ -45,8 +45,6 @@ class ConfigureMainMenuListener implements TranslationContainerInterface
     }
 
     /**
-     * @param \EzSystems\EzPlatformAdminUi\Menu\Event\ConfigureMenuEvent $event
-     *
      * @throws \eZ\Publish\API\Repository\Exceptions\NotFoundException
      * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException
      */
@@ -54,7 +52,7 @@ class ConfigureMainMenuListener implements TranslationContainerInterface
     {
         $event->stopPropagation();
 
-        if(!$this->overrideSiteaccessList) {
+        if (!$this->overrideSiteaccessList) {
             return $this->configureMainMenuListener->onMenuConfigure($event);
         }
 
@@ -122,11 +120,6 @@ class ConfigureMainMenuListener implements TranslationContainerInterface
     }
 
     /**
-     * @param string $siteaccess
-     * @param \eZ\Publish\API\Repository\Values\Content\Location $location
-     *
-     * @return null|\eZ\Publish\API\Repository\Values\Content\Location
-     *
      * @throws \eZ\Publish\API\Repository\Exceptions\NotFoundException
      * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException
      */

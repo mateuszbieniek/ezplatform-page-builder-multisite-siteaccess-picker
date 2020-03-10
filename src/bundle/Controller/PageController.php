@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace MateuszBieniek\EzPlatformPageBuilderMultisiteSiteaccessPickerBundle\Controller;
 
+use eZ\Publish\API\Repository\Values\Content\Language;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use EzSystems\EzPlatformAdminUi\View\ContentTranslateView;
 use EzSystems\EzPlatformAdminUiBundle\Controller\Controller;
+use EzSystems\EzPlatformPageBuilder\PageBuilder;
 use EzSystems\EzPlatformPageBuilder\Siteaccess\SiteaccessService;
 use EzSystems\EzPlatformPageBuilder\View\PageView;
 use EzSystems\EzPlatformPageBuilderBundle\Controller\PageController as PageBuilderPageController;
@@ -15,7 +17,6 @@ use EzSystems\RepositoryForms\Content\View\ContentCreateView;
 use EzSystems\RepositoryForms\Content\View\ContentEditView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use EzSystems\EzPlatformPageBuilder\PageBuilder;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class PageController extends Controller
@@ -50,13 +51,6 @@ class PageController extends Controller
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param int $locationId
-     * @param int|null $versionNo
-     * @param string|null $siteaccessName
-     *
-     * @return \EzSystems\EzPlatformPageBuilder\View\PageView
-     *
      * @throws \eZ\Publish\API\Repository\Exceptions\NotFoundException
      * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException
      * @throws \eZ\Publish\Core\Base\Exceptions\InvalidArgumentException
@@ -73,11 +67,6 @@ class PageController extends Controller
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param string $url
-     *
-     * @return \EzSystems\EzPlatformPageBuilder\View\PageView
-     *
      * @throws \eZ\Publish\Core\MVC\Exception\InvalidSiteAccessException
      * @throws \Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException
      * @throws \Symfony\Component\Translation\Exception\InvalidArgumentException
@@ -94,19 +83,16 @@ class PageController extends Controller
     }
 
     /**
-     * @param \EzSystems\RepositoryForms\Content\View\ContentEditView $view
-     *
-     * @return \EzSystems\RepositoryForms\Content\View\ContentEditView
-     *
      * @throws \Exception
      */
     public function editAction(Request $request, ContentEditView $view): ContentEditView
     {
+        $language = $view->getLanguage();
         $location = $view->getLocation();
         $siteaccesses = $this->pageBuilderPermissionAwareConfigurationResolver->getSiteaccessList();
         $currentSiteaccess = $this->session->get(EzPlatformPageBuilderExtension::SESSION_KEY_SITEACCESS, reset($siteaccesses));
 
-        $currentSiteaccess = $this->getAvailableSiteaccess($currentSiteaccess, $siteaccesses, $location);
+        $currentSiteaccess = $this->getAvailableSiteaccess($currentSiteaccess, $siteaccesses, $location, $language);
 
         if (!$currentSiteaccess) {
             throw new \RuntimeException('No SiteAccess available for this Page');
@@ -118,11 +104,6 @@ class PageController extends Controller
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \EzSystems\RepositoryForms\Content\View\ContentCreateView $view
-     *
-     * @return \EzSystems\RepositoryForms\Content\View\ContentCreateView
-     *
      * @throws \Exception
      */
     public function createAction(Request $request, ContentCreateView $view): ContentCreateView
@@ -142,13 +123,6 @@ class PageController extends Controller
         return $this->pageController->createAction($request, $view);
     }
 
-    /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param int $locationId
-     * @param string|null $siteaccessName
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
     public function createDraftAction(
         Request $request,
         int $locationId,
@@ -158,11 +132,6 @@ class PageController extends Controller
     }
 
     /**
-     * @param \EzSystems\EzPlatformAdminUi\View\ContentTranslateView $view
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     *
-     * @return \EzSystems\EzPlatformAdminUi\View\ContentTranslateView
-     *
      * @throws \Exception
      */
     public function translateAction(ContentTranslateView $view, Request $request): ContentTranslateView
@@ -171,11 +140,6 @@ class PageController extends Controller
     }
 
     /**
-     * @param string $siteaccess
-     * @param \eZ\Publish\API\Repository\Values\Content\Location $location
-     *
-     * @return boolean
-     *
      * @throws \eZ\Publish\API\Repository\Exceptions\NotFoundException
      * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException
      */
@@ -188,24 +152,43 @@ class PageController extends Controller
             : false;
     }
 
+    private function isLanguageSuportedBySiteaccess(string $siteaccess, Language $language): bool
+    {
+        return \in_array($language->languageCode, $this->siteaccessService->getLanguages($siteaccess));
+    }
 
     /**
-     * @param $currentSiteaccess
-     * @param $siteaccesses
-     * @param $location
-     *
-     * @return string|null
+     * @param string[] $siteaccesses
      *
      * @throws \eZ\Publish\API\Repository\Exceptions\NotFoundException
      * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException
      */
-    private function getAvailableSiteaccess($currentSiteaccess, $siteaccesses, $location): ?string
-    {
+    private function getAvailableSiteaccess(
+        string $currentSiteaccess,
+        array $siteaccesses,
+        Location $location,
+        Language $language
+    ): ?string {
         if (!$this->isLocationInSiteaccessSubTree($currentSiteaccess, $location)) {
             $currentSiteaccess = null;
 
             foreach ($siteaccesses as $availableSiteaccess) {
-                if ($this->isLocationInSiteaccessSubTree($availableSiteaccess, $location)) {
+                if (
+                    $this->isLocationInSiteaccessSubTree($availableSiteaccess, $location)
+                ) {
+                    $currentSiteaccess = $availableSiteaccess;
+
+                    break;
+                }
+            }
+        }
+
+        if (!$this->isLanguageSuportedBySiteaccess($currentSiteaccess, $language)) {
+            foreach ($siteaccesses as $availableSiteaccess) {
+                if (
+                    $this->isLocationInSiteaccessSubTree($availableSiteaccess, $location) &&
+                    $this->isLanguageSuportedBySiteaccess($availableSiteaccess, $language)
+                ) {
                     $currentSiteaccess = $availableSiteaccess;
 
                     break;
