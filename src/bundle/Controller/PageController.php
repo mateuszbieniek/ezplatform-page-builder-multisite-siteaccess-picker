@@ -92,7 +92,9 @@ class PageController extends Controller
         $siteaccesses = $this->pageBuilderPermissionAwareConfigurationResolver->getSiteaccessList();
         $currentSiteaccess = $this->session->get(EzPlatformPageBuilderExtension::SESSION_KEY_SITEACCESS, reset($siteaccesses));
 
-        $currentSiteaccess = $this->getAvailableSiteaccess($currentSiteaccess, $siteaccesses, $location, $language);
+        if($location) {
+            $currentSiteaccess = $this->getAvailableSiteaccess($currentSiteaccess, $siteaccesses, $location, $language);
+        }
 
         if (!$currentSiteaccess) {
             throw new \RuntimeException('No SiteAccess available for this Page');
@@ -108,11 +110,14 @@ class PageController extends Controller
      */
     public function createAction(Request $request, ContentCreateView $view): ContentCreateView
     {
+        $language = $view->getLanguage();
         $location = $view->getLocation();
         $siteaccesses = $this->pageBuilderPermissionAwareConfigurationResolver->getSiteaccessList();
         $currentSiteaccess = $this->session->get(EzPlatformPageBuilderExtension::SESSION_KEY_SITEACCESS, reset($siteaccesses));
 
-        $currentSiteaccess = $this->getAvailableSiteaccess($currentSiteaccess, $siteaccesses, $location);
+        if($location) {
+            $currentSiteaccess = $this->getAvailableSiteaccess($currentSiteaccess, $siteaccesses, $location, $language);
+        }
 
         if (!$currentSiteaccess) {
             throw new \RuntimeException('No SiteAccess available for this Root Location');
@@ -174,7 +179,7 @@ class PageController extends Controller
 
             foreach ($siteaccesses as $availableSiteaccess) {
                 if (
-                    $this->isLocationInSiteaccessSubTree($availableSiteaccess, $location)
+                $this->isLocationInSiteaccessSubTree($availableSiteaccess, $location)
                 ) {
                     $currentSiteaccess = $availableSiteaccess;
 
